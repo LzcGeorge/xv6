@@ -58,21 +58,15 @@ void find(char *path, char *name)
             printf("ls: cannot stat %s\n", buf);
             // continue;
         }
-        switch(st.type){
-        case T_FILE:
-            if (strcmp(de.name, name) == 0)
-            {
+        if (st.type == T_FILE) {
+            if (strcmp(de.name, name) == 0) {
                 printf("%s\n", buf);
             }
-            break;
-        case T_DIR:
-            if (strcmp(de.name, ".") == 0){}
-            else if (strcmp(de.name, "..") == 0) {}
-            else
-            {
+        }
+        else if (st.type == T_DIR){
+            if (strcmp(de.name, ".") != 0 && strcmp(de.name, "..") ){
                 find(buf, name);
             }
-            break;
         }
     }
 
@@ -81,14 +75,14 @@ void find(char *path, char *name)
 
 int main(int argc, char *argv[])
 {
-    if (argc != 3)
-    {
+    if (argc == 2) {
         // 在当前层 find
-        // find(".", argv[1]);
-        printf("argc 2 error\n");
+        find(".", argv[1]);
+        exit(0);
+    }
+    if(argc != 3) {
         exit(1);
     }
-
     char *dir = argv[1];
     char *name = argv[2];
     find(dir, name);
