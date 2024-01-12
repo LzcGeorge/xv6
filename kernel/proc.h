@@ -106,4 +106,5 @@ struct proc {
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
   int mask;                    // trace mask
+  struct sysinfo *sysinfo;     // a pointer to a struct sysinfo 
 };

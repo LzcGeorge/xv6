@@ -37,3 +37,4 @@ entry("sbrk");
 entry("sleep");
 entry("uptime");
 entry("trace"); # System call tracing
+entry("sysinfo"); # sysinfotest
