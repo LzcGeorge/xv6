@@ -81,7 +81,49 @@ int
 sys_pgaccess(void)
 {
   // lab pgtbl: your code here.
+  uint64 va;
+  uint64 user_addr;
+  int page_num;
+  unsigned int abits = 0;
+
+  if(argaddr(0, &va) < 0)
+    return -1;
+
+  if(argint(1, &page_num) < 0)
+    return -1;
+
+  if(argaddr(2,&user_addr) < 0)
+    return -1;
+
+  pte_t * pte;
+  struct proc *p = myproc();
+
+  uint64 cur = PGROUNDDOWN(va); // 对地址进行舍入操作，以确保它们指向页的开始，而不是位于页的中间。
+
+  // 第 page_num 页
+  uint64 va_page_end = PGROUNDDOWN(cur + page_num * PGSIZE - 1);
+
+  // 32 ：set an upper limit on the number of pages that can be scanned.
+  for(int i = 0; i < 32 && cur <= va_page_end; i ++, cur += PGSIZE )
+  {
+    // walk(pagetable_t pagetable, uint64 va, int alloc) 
+    // Return the address of the PTE in page table pagetable
+    // 1 --> alloc bit : If alloc!=0, create any required page-table pages.
+    if((pte = walk(p->pagetable,cur,0)) == 0) {
+      continue;
+    }
+    else
+    {
+      if(*pte & PTE_A) {
+        abits |= (1L << i);
+        *pte &= ~PTE_A; 
+      }
+    }
+  }
+  // copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
+  copyout(p->pagetable, user_addr, (char *) &abits, sizeof(abits));
   return 0;
+
 }
 #endif
 
